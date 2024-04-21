@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Hippodamia Doc",
   description: "Document for hippodamia and hippodamia/bot",
+  base:"/doc/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
