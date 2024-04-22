@@ -69,19 +69,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
         with:
           source-repo: "https://github.com/Hippodamia/doc.git"
-          destination-repo: "git@gitee.com:heerkaisair/hippodamia-doc.git"
-  # 部署工作
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build-and-sync
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          destination-repo: "git@gitee.com:hippodamia/doc.git"
 
   gitee-refresh:
     runs-on: ubuntu-latest
@@ -93,5 +81,5 @@ jobs:
         with:
           gitee-username: heerkaisair
           gitee-password: ${{ secrets.GITEE_PASSWORD }}
-          gitee-repo: heerkaisair/hippodamia-doc
+          gitee-repo: hippodamia/doc
           branch: gh-pages
