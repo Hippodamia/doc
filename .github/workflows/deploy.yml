@@ -1,6 +1,6 @@
 # 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
 #
-name: Deploy VitePress site to Pages
+name: Deploy VitePress site to Pages And Sync to Gitee Pages
 
 on:
   # 在针对 `main` 分支的推送上运行。如果你
@@ -25,39 +25,71 @@ concurrency:
 
 jobs:
   # 构建工作
-  build:
+  build-and-sync:
     runs-on: ubuntu-latest
+    name: Build and Sync
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
-      # - uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消注释
-      # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释
+
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      - name: Install dependencies
+
+      - name: Install Dependencies
         run: bun i # 或 pnpm install / yarn install / bun install
+
       - name: Build with VitePress
         run: bun run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
 
+      - name: Deploy for Gitee 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.6.0
+        with:
+          branch: gh-pages
+          folder: docs/.vitepress/dist
+          # enable single-commit to reduce the repo size
+          single-commit: true
+          clean: true
+
+      - name: Sync to Gitee
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: "git@gitee.com:heerkaisair/hippodamia-doc.git"
+          ssh_private_key: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
   # 部署工作
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
+    needs: build-and-sync
     runs-on: ubuntu-latest
     name: Deploy
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  gitee-refresh:
+    runs-on: ubuntu-latest
+    name: Gitee Pages Refresh
+    needs: build-and-sync
+    steps:
+      - name: Build Gitee Pages
+        uses: yanglbme/gitee-pages-action@main
+        with:
+          gitee-username: heerkaisair
+          gitee-password: ${{ secrets.GITEE_PASSWORD }}
+          gitee-repo: heerkaisair/hippodamia-doc
+          branch: gh-pages

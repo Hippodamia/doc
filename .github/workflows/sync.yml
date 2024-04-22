@@ -1,7 +1,7 @@
 name: Sync
 on:
-  push:
-    branches: [main]
+  #push:
+    #branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -12,11 +12,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Sync to Gitee
         uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url: "git@gitee.com:heerkaisair/hippodamia-doc.git"
           ssh_private_key: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Install dependencies
+        run: bun i # 或 pnpm install / yarn install / bun install
+
+      - name: Build with VitePress
+        run: bun run docs:build
 
       - name: Build Gitee Pages
         uses: yanglbme/gitee-pages-action@main
@@ -28,4 +43,4 @@ jobs:
           # 注意替换为你的 Gitee 仓库，仓库名严格区分大小写，请准确填写，否则会出错
           gitee-repo: hippodamia-doc
           # 要部署的分支，默认是 master，若是其他分支，则需要指定（指定的分支必须存在）
-          branch: main
+          branch: gh-pages
