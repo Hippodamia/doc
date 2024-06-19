@@ -1,0 +1,1 @@
+import{_ as e,c as a,o as t,a4 as i}from"./chunks/framework.DpGEzsCt.js";const u=JSON.parse('{"title":"部署","description":"","frontmatter":{},"headers":[],"relativePath":"deploy/index.md","filePath":"deploy/index.md"}'),s={name:"deploy/index.md"},r=i("",10),o=[r];function l(n,p,h,d,c,_){return t(),a("div",null,o)}const g=e(s,[["render",l]]);export{u as __pageData,g as default};
